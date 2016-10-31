@@ -7,7 +7,7 @@
 class metal : public material {
 public:
 	metal(const vec3& a, float f) :albedo(a) { if (f < 1) fuzziness = f; else fuzziness = 1; }
-	virtual bool material::scatter(const ray& r_in, const hit_record& rec, vec3& attenuation, ray& scattered) const
+	virtual bool scatter(const ray& r_in, const hit_record& rec, vec3& attenuation, ray& scattered) const
 	{
 		vec3 reflected = reflect(unit_vector(r_in.direction()), rec.normal);
 		scattered = ray(rec.p, reflected + fuzziness* random_in_unit_sphere());
