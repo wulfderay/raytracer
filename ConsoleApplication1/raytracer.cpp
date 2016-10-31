@@ -4,8 +4,6 @@
 #include <iostream>
 
 
-
-
 #include "vec3.h"
 #include "ray.h"
 #include "hitable.h"
@@ -21,7 +19,7 @@
 #include <list>
 #include "threads.h"
 
-#ifdef _WINDOWS_MAGIC
+#ifdef _WIN32
 #include "stdafx.h"
 #else
  #include <limits>
@@ -35,7 +33,6 @@
 
 int main(int argc, char ** argv)
 {
-
 	int nx = 1600;
 	int ny = 800;
 	if (argc == 3)

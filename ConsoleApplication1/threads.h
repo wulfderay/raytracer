@@ -1,7 +1,7 @@
 #ifndef THREADS_H_INCLUDED
 #define THREADS_H_INCLUDED
 
-#ifdef _WINDOWS_MAGIC
+#ifdef _WIN32
 #include "stdafx.h"
 #else
  #include <limits>
@@ -81,7 +81,7 @@ bool renderSection(vec3* buffer,int bufferx,int buffery, int rendery, int sizey,
 	return true;
 }
 
-#ifdef _WINDOWS_MAGIC
+#ifdef _WIN32
 #include <windows.h>
 #include <tchar.h>
 #include <strsafe.h>
