@@ -58,7 +58,11 @@ world: scene to render
 */
 bool renderSection(vec3* buffer,int bufferx,int buffery, int rendery, int sizey, const hitable * world)
 {
-	camera cam(vec3(-1,2,1), vec3(0,0,-1), vec3(0,1,0),90, float(bufferx) / float(buffery));
+	vec3 lookfrom = vec3(-1, 2, 1);
+	vec3 lookat = vec3(.2, -.2, -.8);
+	float dist_to_focus = (lookfrom - lookat).length();
+	float aperture = 1.0;
+	camera cam(lookfrom,lookat , vec3(0,1,0),20, float(bufferx) / float(buffery), aperture, dist_to_focus);
 	int ns = 1000;
 	for (int j = rendery; j < sizey+rendery; j++)
 	{
