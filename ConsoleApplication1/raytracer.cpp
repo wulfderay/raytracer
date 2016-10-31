@@ -65,7 +65,7 @@ world: scene to render
 */
 bool renderSection(vec3* buffer,int bufferx,int buffery, int rendery, int sizey, const hitable * world)
 {
-	camera cam;
+	camera cam(90, float(bufferx)/float(buffery));
 	int ns = 1000;
 	for (int j = rendery; j < sizey+rendery; j++)  // why the fuck do I need the /3?????
 	{
@@ -108,7 +108,7 @@ int main(int argc, char ** argv)
 	list.push_back(new sphere(vec3(1, 0, -1), 0.5, new metal(vec3(0.8, 0.8, 0.8), 0.0)));
 	list.push_back(new sphere(vec3(.2, -.2, -.8), 0.2, new dielectric( 1.5)));
 	hitable * world = new hitable_list(list);
-	camera cam;
+
 	
 	vec3 * buffer = new vec3[nx*ny];
 	renderBythreads(buffer, nx, ny, world);
