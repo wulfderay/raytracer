@@ -8,7 +8,7 @@
  #define FLT_MAX std::numeric_limits<float>::max()
 #endif // _WINDOWS_MAGIC
 
-#define MAX_THREADS 2
+#define MAX_THREADS 4
 
 typedef struct RenderContext {
 	vec3* buffer;
@@ -58,7 +58,7 @@ world: scene to render
 */
 bool renderSection(vec3* buffer,int bufferx,int buffery, int rendery, int sizey, const hitable * world)
 {
-	camera cam(90, float(bufferx) / float(buffery));
+	camera cam(vec3(-1,2,1), vec3(0,0,-1), vec3(0,1,0),90, float(bufferx) / float(buffery));
 	int ns = 1000;
 	for (int j = rendery; j < sizey+rendery; j++)
 	{
