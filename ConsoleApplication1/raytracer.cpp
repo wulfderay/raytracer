@@ -1,15 +1,9 @@
-// ConsoleApplication1.cpp : Defines the entry point for the console application.
-//
 
 #include <iostream>
 
-
-#include "vec3.h"
-#include "ray.h"
 #include "hitable.h"
 #include "sphere.h"
 #include "hitablelist.h"
-#include "camera.h"
 #include <limits>
 #include <string>
 #include <random>
@@ -25,11 +19,6 @@
  #include <limits>
  #define FLT_MAX std::numeric_limits<float>::max()
 #endif // _WINDOWS_MAGIC
-
-
-
-
-
 
 int main(int argc, char ** argv)
 {
@@ -50,8 +39,8 @@ int main(int argc, char ** argv)
 	hitable * world = new hitable_list(list);
 
 	vec3 * buffer = new vec3[nx*ny];
-	renderBythreads(buffer, nx, ny, world);
-    //renderSection(buffer,nx,ny,0,ny,world);
+	threadRenderer renderer = threadRenderer();
+	renderer.renderSection(buffer, nx, ny,0,ny, world);
 	for (int i = 0; i < nx*ny; i++)
 	{
 		std::cout << buffer[i].r() << " " << buffer[i].g() << " " << buffer[i].b() << "\n";
