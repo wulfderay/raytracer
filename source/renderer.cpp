@@ -1,5 +1,10 @@
 #include "renderer.h"
 
+#ifdef linux
+#include <limits>
+#define FLT_MAX std::numeric_limits<float>::max()
+#endif
+
 vec3 color(const ray& r, const hitable *world, int max_depth)
 {
 	hit_record rec;
