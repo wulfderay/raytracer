@@ -8,6 +8,7 @@ public:
 	hitable_list() {}
 	hitable_list(std::list<hitable*> l) { theList = l; }
 	virtual bool hit(const ray& r, float t_min, float t_max, hit_record& rec) const;
+	bool bounding_box(float t0, float t1, aabb& box) const;
 	std::list<hitable*> theList;
 };
 
@@ -23,4 +24,9 @@ bool hitable_list::hit(const ray& r, float t_min, float t_max, hit_record& rec) 
 		}
 	}
 	return hit_anything;
+}
+
+bool hitable_list::bounding_box(float t0, float t1, aabb& box) const
+{
+	return false; // I hope this is right?  if not I have to compute the min and max bounding boxes for the whole thing :/
 }
