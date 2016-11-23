@@ -12,6 +12,8 @@
 #include "dielectric.h"
 #include <list>
 #include "threads.h"
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
 
 #ifdef _WIN32
 #include "stdafx.h"
@@ -22,14 +24,14 @@
 
 int main(int argc, char ** argv)
 {
-	int nx = 1600;
-	int ny = 800;
+	int nx = 400;
+	int ny = 200;
 	if (argc == 3)
 	{
 		nx = std::stoi(argv[1]);
 		ny = std::stoi(argv[2]);
 	}
-	std::cout << "P3\n" << nx << " " << ny << "\n255\n";
+	//std::cout << "P3\n" << nx << " " << ny << "\n255\n";
 
 	std::list<hitable*> list;
 	list.push_back( new sphere(vec3(0, 0, -2.0), 0.5, new lambertian(vec3(0.8, 0.3, 0.3))));
@@ -41,12 +43,17 @@ int main(int argc, char ** argv)
 	vec3 * buffer = new vec3[nx*ny];
 	threadRenderer renderer = threadRenderer();
 	renderer.renderSection(buffer, nx, ny,0,ny, world);
+	uint8_t * raw_buffer= new uint8_t[nx*ny * 3];
 	for (int i = 0; i < nx*ny; i++)
 	{
-		std::cout << buffer[i].r() << " " << buffer[i].g() << " " << buffer[i].b() << "\n";
+		//std::cout << buffer[i].r() << " " << buffer[i].g() << " " << buffer[i].b() << "\n";
+		raw_buffer[i * 3] = buffer[i].r();
+		raw_buffer[(i * 3) + 1] = buffer[i].g();
+		raw_buffer[(i * 3) + 2] = buffer[i].b();
 	}
+	
 
-
+	stbi_write_png("out.png", nx, ny, 3, raw_buffer, 0);
 	return 0;
 }
 

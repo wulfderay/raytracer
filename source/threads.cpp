@@ -17,7 +17,7 @@ bool renderByThread(vec3* buffer, int bufferx, int buffery, int rendery, int siz
 	float dist_to_focus = (lookfrom - lookat).length();
 	float aperture = 1.0;
 	camera cam(lookfrom, lookat, vec3(0, 1, 0), 20, float(bufferx) / float(buffery), aperture, dist_to_focus);
-	int ns = 1000;
+	int ns = 10;  // this desperately needs to stop being a magic number...
 	for (int j = rendery; j < sizey + rendery; j++)
 	{
 		for (int i = 0; i < bufferx; i++)
