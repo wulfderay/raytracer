@@ -11,7 +11,7 @@ class threadRenderer :Renderer
 {
 public:
 	// probably want a constructor that takes the max threads etc...
-	bool renderSection(vec3* buffer, int bufferx, int buffery, int rendery, int sizey, const hitable * world);
+	bool renderSection(PRENDERCONTEXT rc) override;
 private:
     bool renderByThread(vec3* buffer, int bufferx, int buffery, int rendery, int sizey, const hitable * world);
 };

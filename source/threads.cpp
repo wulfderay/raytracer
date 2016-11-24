@@ -60,7 +60,7 @@ sizex: width of the block to render
 sizey: height of the block to render
 world: scene to render
 */
-bool threadRenderer::renderSection(vec3* buffer, int bufferx, int buffery, int rendery, int sizey, const hitable * world)
+bool threadRenderer::renderSection(PRENDERCONTEXT rc)
 {
 	//TODO:  alter this to only render the sectoin specified.
 
@@ -87,12 +87,12 @@ bool threadRenderer::renderSection(vec3* buffer, int bufferx, int buffery, int r
 
 		// Generate unique data for each thread to work with.
 
-		pDataArray[i]->buffer = buffer;
-		pDataArray[i]->bufferx = bufferx;
-		pDataArray[i]->buffery = buffery;
-		pDataArray[i]->rendery = i*buffery / MAX_THREADS;
-		pDataArray[i]->sizey = buffery / MAX_THREADS;
-		pDataArray[i]->world = world;
+		pDataArray[i]->buffer = rc->buffer;
+		pDataArray[i]->bufferx = rc->bufferx;
+		pDataArray[i]->buffery = rc->buffery;
+		pDataArray[i]->rendery = i*rc->buffery / MAX_THREADS;
+		pDataArray[i]->sizey = rc->buffery / MAX_THREADS;
+		pDataArray[i]->world = rc->world;
 
 
 		// Create the thread to begin execution on its own.
