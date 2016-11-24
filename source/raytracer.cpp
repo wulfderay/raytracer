@@ -42,7 +42,14 @@ int main(int argc, char ** argv)
 
 	vec3 * buffer = new vec3[nx*ny];
 	threadRenderer renderer = threadRenderer();
-	renderer.renderSection(buffer, nx, ny,0,ny, world);
+	RENDERCONTEXT rc;
+	rc.buffer = buffer;
+	rc.bufferx = nx;
+	rc.buffery = ny;
+	rc.rendery = 0;
+	rc.sizey = ny;
+	rc.world = world;
+	renderer.renderSection(&rc);
 	uint8_t * raw_buffer= new uint8_t[nx*ny * 3];
 	for (int i = 0; i < nx*ny; i++)
 	{

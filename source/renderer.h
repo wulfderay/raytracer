@@ -15,8 +15,12 @@ typedef struct RenderContext {
 
 class Renderer {
 public:
+	virtual ~Renderer()
+	{
+	}
+
 	// nope. this is not what we want exactly...
-	virtual bool renderSection(vec3* buffer, int bufferx, int buffery, int rendery, int sizey, const hitable * world) = 0; // although we probably want it to take a render context instead..
+	virtual bool renderSection(PRENDERCONTEXT rc) = 0; // although we probably want it to take a render context instead..
 };
 
 
