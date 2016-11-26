@@ -100,6 +100,6 @@ bool bvh_node::hit(const ray& r, float t_min, float t_max, hit_record& rec) cons
 			rec = right_rec;
 			return true;
 		}
-		return false;
 	}
+	return false;
 }
