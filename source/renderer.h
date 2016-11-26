@@ -9,6 +9,7 @@ typedef struct RenderContext {
 	int rendery;
 	int sizey;
 	const hitable * world;
+	int samples = 100;
 	// probably want something to do with the camera?
 } RENDERCONTEXT, *PRENDERCONTEXT;
 

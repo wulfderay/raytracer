@@ -14,6 +14,7 @@ public:
 	bool renderSection(PRENDERCONTEXT rc) override;
 private:
     bool renderByThread(vec3* buffer, int bufferx, int buffery, int rendery, int sizey, const hitable * world);
+	bool renderByThread(PRENDERCONTEXT rc);
 };
 
 #endif // THREADS_H_INCLUDED

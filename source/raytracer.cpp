@@ -24,14 +24,13 @@
 
 int main(int argc, char ** argv)
 {
-	int nx = 400;
-	int ny = 200;
+	int nx = 600;
+	int ny = 300;
 	if (argc == 3)
 	{
 		nx = std::stoi(argv[1]);
 		ny = std::stoi(argv[2]);
 	}
-	//std::cout << "P3\n" << nx << " " << ny << "\n255\n";
 
 	std::list<hitable*> list;
 	list.push_back( new sphere(vec3(0, 0, -2.0), 0.5, new lambertian(vec3(0.8, 0.3, 0.3))));
@@ -49,11 +48,11 @@ int main(int argc, char ** argv)
 	rc.rendery = 0;
 	rc.sizey = ny;
 	rc.world = world;
+	rc.samples = 500;
 	renderer.renderSection(&rc);
 	uint8_t * raw_buffer= new uint8_t[nx*ny * 3];
 	for (int i = 0; i < nx*ny; i++)
 	{
-		//std::cout << buffer[i].r() << " " << buffer[i].g() << " " << buffer[i].b() << "\n";
 		raw_buffer[i * 3] = buffer[i].r();
 		raw_buffer[(i * 3) + 1] = buffer[i].g();
 		raw_buffer[(i * 3) + 2] = buffer[i].b();

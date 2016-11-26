@@ -10,30 +10,29 @@ once the picture is rnedered, the array needs to be written out. one interesting
 rendered because otherwise we won't write things in the right order.
 */
 
-bool renderByThread(vec3* buffer, int bufferx, int buffery, int rendery, int sizey, const hitable * world)
+bool renderByThread(PRENDERCONTEXT rc)
 {
     vec3 lookfrom = vec3(-1, 2, 1);
 	vec3 lookat = vec3(.2, -.2, -.8);
 	float dist_to_focus = (lookfrom - lookat).length();
 	float aperture = 1.0;
-	camera cam(lookfrom, lookat, vec3(0, 1, 0), 20, float(bufferx) / float(buffery), aperture, dist_to_focus);
-	int ns = 10;  // this desperately needs to stop being a magic number...
-	for (int j = rendery; j < sizey + rendery; j++)
+	camera cam(lookfrom, lookat, vec3(0, 1, 0), 20, float(rc->bufferx) / float(rc->buffery), aperture, dist_to_focus);
+	for (int j = rc->rendery; j < rc->sizey + rc->rendery; j++)
 	{
-		for (int i = 0; i < bufferx; i++)
+		for (int i = 0; i < rc->bufferx; i++)
 		{
 			vec3 col(0, 0, 0);
-			for (int s = 0; s < ns; s++)
+			for (int s = 0; s < rc->samples; s++)
 			{
-				float u = float(i + float(rand()) / RAND_MAX) / float(bufferx);
-				float v = float(j + float(rand()) / RAND_MAX) / float(buffery);
+				float u = float(i + float(rand()) / RAND_MAX) / float(rc->bufferx);
+				float v = float(j + float(rand()) / RAND_MAX) / float(rc->buffery);
 				ray r = cam.get_ray(u, v);
-				col += color(r, world, 0);
+				col += color(r, rc->world, 0);
 			}
-			col /= float(ns);
+			col /= float(rc->samples);
 			col = vec3(int(255.99 *sqrt(col[0])), int(255.99 *sqrt(col[1])), int(255.99 *sqrt(col[2])));
 
-			buffer[((buffery - j - 1)*bufferx) + i] = col;
+			rc->buffer[((rc->buffery - j - 1)*rc->bufferx) + i] = col;
 		}
 	}
 	return 0;
@@ -93,7 +92,7 @@ bool threadRenderer::renderSection(PRENDERCONTEXT rc)
 		pDataArray[i]->rendery = i*rc->buffery / MAX_THREADS;
 		pDataArray[i]->sizey = rc->buffery / MAX_THREADS;
 		pDataArray[i]->world = rc->world;
-
+		pDataArray[i]->samples = rc->samples;
 
 		// Create the thread to begin execution on its own.
 
@@ -141,7 +140,7 @@ DWORD WINAPI RenderThread(LPVOID lpParam)
 	//HANDLE hStdout;
 	PRENDERCONTEXT pRenderContext = (PRENDERCONTEXT)lpParam;
 	// now I know that passing a pointer to a buffer into a thread is not threadsafe, but given that the threads will all be accessing different parts of the buffer, it should be fine.
-    renderByThread(pRenderContext->buffer, pRenderContext->bufferx, pRenderContext->buffery, pRenderContext->rendery, pRenderContext->sizey, pRenderContext->world);
+    renderByThread(pRenderContext);
 	return 0;
 }
 
@@ -186,7 +185,7 @@ void ErrorHandler(LPTSTR lpszFunction)
 
 void *RenderThread(void * param);
 
-bool threadRenderer::renderSection(vec3* buffer, int bufferx, int buffery, int rendery, int sizey, const hitable * world)
+bool threadRenderer::renderSection(PRENDERCONTEXT rc)
 {
 	RENDERCONTEXT pDataArray[MAX_THREADS];
 	pthread_t  hThreadArray[MAX_THREADS];
@@ -195,13 +194,13 @@ bool threadRenderer::renderSection(vec3* buffer, int bufferx, int buffery, int r
 
 	for (int i = 0; i<MAX_THREADS; i++)
 	{
-		pDataArray[i].buffer = buffer;
-		pDataArray[i].bufferx = bufferx;
-		pDataArray[i].buffery = buffery;
-		pDataArray[i].rendery = i*buffery / MAX_THREADS;
-		pDataArray[i].sizey = buffery / MAX_THREADS;
-		pDataArray[i].world = world;
-
+		pDataArray[i]->buffer = rc->buffer;
+		pDataArray[i]->bufferx = rc->bufferx;
+		pDataArray[i]->buffery = rc->buffery;
+		pDataArray[i]->rendery = i*rc->buffery / MAX_THREADS;
+		pDataArray[i]->sizey = rc->buffery / MAX_THREADS;
+		pDataArray[i]->world = rc->world;
+		pDataArray[i]->samples = rc->samples;
 
 		// Create the thread to begin execution on its own.
 
@@ -228,7 +227,7 @@ void *RenderThread(void * param)
 	//HANDLE hStdout;
 	PRENDERCONTEXT pRenderContext = (PRENDERCONTEXT)param;
 	// now I know that passing a pointer to a buffer into a thread is not threadsafe, but given that the threads will all be accessing different parts of the buffer, it should be fine.
-	renderByThread(pRenderContext->buffer, pRenderContext->bufferx, pRenderContext->buffery, pRenderContext->rendery, pRenderContext->sizey, pRenderContext->world);
+	renderByThread(pRenderContext);
 	return 0; // this is probs wron g.
 }
 
