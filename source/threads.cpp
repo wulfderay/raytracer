@@ -76,7 +76,7 @@ bool threadRenderer::renderSection(PRENDERCONTEXT rc)
 		pDataArray[i] = (PRENDERCONTEXT)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY,
 			sizeof(RENDERCONTEXT));
 
-		if (pDataArray[i] == NULL)
+		if (pDataArray[i] == nullptr)
 		{
 			// If the array allocation fails, the system is out of memory
 			// so there is no point in trying to print an error message.
@@ -97,7 +97,7 @@ bool threadRenderer::renderSection(PRENDERCONTEXT rc)
 		// Create the thread to begin execution on its own.
 
 		hThreadArray[i] = CreateThread(
-			NULL,                   // default security attributes
+			nullptr,                   // default security attributes
 			0,                      // use default stack size
 			RenderThread,       // thread function name
 			pDataArray[i],          // argument to thread function
@@ -109,7 +109,7 @@ bool threadRenderer::renderSection(PRENDERCONTEXT rc)
 									// If CreateThread fails, terminate execution.
 									// This will automatically clean up threads and memory.
 
-		if (hThreadArray[i] == NULL)
+		if (hThreadArray[i] == nullptr)
 		{
 			ErrorHandler(TEXT("CreateThread"));
 			ExitProcess(3);
@@ -125,10 +125,10 @@ bool threadRenderer::renderSection(PRENDERCONTEXT rc)
 	for (int i = 0; i<MAX_THREADS; i++)
 	{
 		CloseHandle(hThreadArray[i]);
-		if (pDataArray[i] != NULL)
+		if (pDataArray[i] != nullptr)
 		{
 			HeapFree(GetProcessHeap(), 0, pDataArray[i]);
-			pDataArray[i] = NULL;    // Ensure address is not reused.
+			pDataArray[i] = nullptr;    // Ensure address is not reused.
 		}
 	}
 	return true;
@@ -158,11 +158,11 @@ void ErrorHandler(LPTSTR lpszFunction)
 		FORMAT_MESSAGE_ALLOCATE_BUFFER |
 		FORMAT_MESSAGE_FROM_SYSTEM |
 		FORMAT_MESSAGE_IGNORE_INSERTS,
-		NULL,
+		nullptr,
 		dw,
 		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 		(LPTSTR)&lpMsgBuf,
-		0, NULL);
+		0, nullptr);
 
 	// Display the error message.
 
@@ -172,7 +172,7 @@ void ErrorHandler(LPTSTR lpszFunction)
 		LocalSize(lpDisplayBuf) / sizeof(TCHAR),
 		TEXT("%s failed with error %d: %s"),
 		lpszFunction, dw, lpMsgBuf);
-	MessageBox(NULL, (LPCTSTR)lpDisplayBuf, TEXT("Error"), MB_OK);
+	MessageBox(nullptr, (LPCTSTR)lpDisplayBuf, TEXT("Error"), MB_OK);
 
 	// Free error-handling buffer allocations.
 
