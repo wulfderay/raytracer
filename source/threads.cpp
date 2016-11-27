@@ -1,6 +1,7 @@
 #include "threads.h"
 #include "camera.h"
 #include <chrono>
+#include <thread>
 #ifdef _WIN32
 #include "stdafx.h"
 #endif // _WINDOWS_MAGIC
@@ -55,14 +56,14 @@ void ErrorHandler(LPTSTR lpszFunction);
 bool threadRenderer::renderSection(PRENDERCONTEXT rc)
 {
 	//TODO:  alter this to only render the sectoin specified.
-
+	int num_threads = std::thread::hardware_concurrency();
 	PRENDERCONTEXT pDataArray[MAX_THREADS];
 	DWORD   dwThreadIdArray[MAX_THREADS];
 	HANDLE  hThreadArray[MAX_THREADS];
 
 	// Create MAX_THREADS worker threads.
 
-	for (int i = 0; i<MAX_THREADS; i++)
+	for (int i = 0; i<num_threads; i++)
 	{
 		// Allocate memory for thread data.
 
@@ -112,11 +113,11 @@ bool threadRenderer::renderSection(PRENDERCONTEXT rc)
 
 	  // Wait until all threads have terminated.
 
-	WaitForMultipleObjects(MAX_THREADS, hThreadArray, TRUE, INFINITE);
+	WaitForMultipleObjects(num_threads, hThreadArray, TRUE, INFINITE);
 
 	// Close all thread handles and free memory allocations.
 
-	for (int i = 0; i<MAX_THREADS; i++)
+	for (int i = 0; i<num_threads; i++)
 	{
 		CloseHandle(hThreadArray[i]);
 		if (pDataArray[i] != nullptr)

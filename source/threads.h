@@ -3,7 +3,7 @@
 
 #include "renderer.h"
 
-#define MAX_THREADS 20 // should use std::thread::hardware_concurrency(); instead...
+#define MAX_THREADS 16 // should use std::thread::hardware_concurrency(); instead...
 
 
 
