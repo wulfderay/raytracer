@@ -67,6 +67,12 @@ int main(int argc, char ** argv)
 	return 0;
 }
 
+void printUsageAndExit(const char * progname)
+{
+	// Unknown parameter. print usage and exit.
+	std::cout << "Usage: " << progname << " [-h height] [-w width] [-s number_multisamples] [-f output_filename]" << std::endl;
+	exit(EXIT_FAILURE);
+}
 
 RENDERCONTEXT getOptionsFromInput(int argc, char** argv) // hmm.. what about filename? 
 {
@@ -77,8 +83,10 @@ RENDERCONTEXT getOptionsFromInput(int argc, char** argv) // hmm.. what about fil
 	rc.samples = 100;
 	rc.filename ="out.png";
 
-	for (auto i = 1; i <argc-1; i ++) 
+	for (auto i = 1; i <argc; i ++) 
 	{
+		if (i + 1 >= argc)
+			printUsageAndExit(argv[0]);
 		if (!strcmp(argv[i], "-h")) // height
 		{
 			rc.buffer_height = std::stoi(argv[i+1]);
@@ -103,7 +111,7 @@ RENDERCONTEXT getOptionsFromInput(int argc, char** argv) // hmm.. what about fil
 			++i;
 			continue;
 		}
-		// Unknown parameter. print usage and exit.
+		printUsageAndExit(argv[0]);
 	}
 	rc.buffer = new vec3[rc.buffer_height*rc.buffer_width];
 	return rc;

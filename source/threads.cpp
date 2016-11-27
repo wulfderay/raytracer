@@ -1,9 +1,12 @@
 #include "threads.h"
 #include "camera.h"
+#include <chrono>
 #ifdef _WIN32
 #include "stdafx.h"
 #endif // _WINDOWS_MAGIC
 
+
+using namespace std::chrono;
 /*
 Ok. So to divide this up into threadable chunks, I need to be able to call a function with the state of the scene and a coordinate range to render...
 once the picture is rnedered, the array needs to be written out. one interesting thing is that we need to keep everything in memory until it's all
@@ -49,16 +52,6 @@ bool renderByThread(PRENDERCONTEXT rc)
 DWORD WINAPI RenderThread(LPVOID lpParam);
 void ErrorHandler(LPTSTR lpszFunction);
 
-/*
-buffer: where the results go.
-buffer_width: how wide the buffer is.
-buffer_height: how tall the buffer is.
-renderx: starting coord of the area to render
-y_offset: starting coord of the area to render
-sizex: width of the block to render
-num_rows_to_render: height of the block to render
-world: scene to render
-*/
 bool threadRenderer::renderSection(PRENDERCONTEXT rc)
 {
 	//TODO:  alter this to only render the sectoin specified.
@@ -114,6 +107,7 @@ bool threadRenderer::renderSection(PRENDERCONTEXT rc)
 			ErrorHandler(TEXT("CreateThread"));
 			ExitProcess(3);
 		}
+		std::cout << "Started thread  " << GetThreadId(hThreadArray[i]) << std::endl;
 	} // End of main thread creation loop.
 
 	  // Wait until all threads have terminated.
@@ -137,10 +131,16 @@ bool threadRenderer::renderSection(PRENDERCONTEXT rc)
 
 DWORD WINAPI RenderThread(LPVOID lpParam)
 {
+	milliseconds start = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 	//HANDLE hStdout;
 	PRENDERCONTEXT pRenderContext = (PRENDERCONTEXT)lpParam;
 	// now I know that passing a pointer to a buffer into a thread is not threadsafe, but given that the threads will all be accessing different parts of the buffer, it should be fine.
     renderByThread(pRenderContext);
+	milliseconds end = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+
+	auto total_ms = (end - start).count();
+
+	std::cout << "Finished thread  "<< GetCurrentThreadId() << " in " << total_ms / 1000 << "." << total_ms % 1000 << "s" << std::endl;
 	return 0;
 }
 
