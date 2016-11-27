@@ -1,5 +1,4 @@
 #pragma once
-#pragma once
 #include "hitable.h"
 
 class dielectric : public material {

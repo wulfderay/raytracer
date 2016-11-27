@@ -4,12 +4,13 @@
 
 typedef struct RenderContext {
 	vec3* buffer;
-	int bufferx;
-	int buffery;
-	int rendery;
-	int sizey;
+	int buffer_width;
+	int buffer_height;
+	int y_offset;
+	int num_rows_to_render;
 	const hitable * world;
 	int samples = 100;
+	char * filename;
 	// probably want something to do with the camera?
 } RENDERCONTEXT, *PRENDERCONTEXT;
 

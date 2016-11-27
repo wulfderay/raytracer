@@ -16,23 +16,23 @@ bool renderByThread(PRENDERCONTEXT rc)
 	vec3 lookat = vec3(.2, -.2, -.8);
 	float dist_to_focus = (lookfrom - lookat).length();
 	float aperture = 1.0;
-	camera cam(lookfrom, lookat, vec3(0, 1, 0), 20, float(rc->bufferx) / float(rc->buffery), aperture, dist_to_focus);
-	for (int j = rc->rendery; j < rc->sizey + rc->rendery; j++)
+	camera cam(lookfrom, lookat, vec3(0, 1, 0), 20, float(rc->buffer_width) / float(rc->buffer_height), aperture, dist_to_focus);
+	for (int j = rc->y_offset; j < rc->num_rows_to_render + rc->y_offset; j++)
 	{
-		for (int i = 0; i < rc->bufferx; i++)
+		for (int i = 0; i < rc->buffer_width; i++)
 		{
 			vec3 col(0, 0, 0);
 			for (int s = 0; s < rc->samples; s++)
 			{
-				float u = float(i + float(rand()) / RAND_MAX) / float(rc->bufferx);
-				float v = float(j + float(rand()) / RAND_MAX) / float(rc->buffery);
+				float u = float(i + float(rand()) / RAND_MAX) / float(rc->buffer_width);
+				float v = float(j + float(rand()) / RAND_MAX) / float(rc->buffer_height);
 				ray r = cam.get_ray(u, v);
 				col += color(r, rc->world, 0);
 			}
 			col /= float(rc->samples);
 			col = vec3(int(255.99 *sqrt(col[0])), int(255.99 *sqrt(col[1])), int(255.99 *sqrt(col[2])));
 
-			rc->buffer[((rc->buffery - j - 1)*rc->bufferx) + i] = col;
+			rc->buffer[((rc->buffer_height - j - 1)*rc->buffer_width) + i] = col;
 		}
 	}
 	return 0;
@@ -51,12 +51,12 @@ void ErrorHandler(LPTSTR lpszFunction);
 
 /*
 buffer: where the results go.
-bufferx: how wide the buffer is.
-buffery: how tall the buffer is.
+buffer_width: how wide the buffer is.
+buffer_height: how tall the buffer is.
 renderx: starting coord of the area to render
-rendery: starting coord of the area to render
+y_offset: starting coord of the area to render
 sizex: width of the block to render
-sizey: height of the block to render
+num_rows_to_render: height of the block to render
 world: scene to render
 */
 bool threadRenderer::renderSection(PRENDERCONTEXT rc)
@@ -87,10 +87,10 @@ bool threadRenderer::renderSection(PRENDERCONTEXT rc)
 		// Generate unique data for each thread to work with.
 
 		pDataArray[i]->buffer = rc->buffer;
-		pDataArray[i]->bufferx = rc->bufferx;
-		pDataArray[i]->buffery = rc->buffery;
-		pDataArray[i]->rendery = i*rc->buffery / MAX_THREADS;
-		pDataArray[i]->sizey = rc->buffery / MAX_THREADS;
+		pDataArray[i]->buffer_width = rc->buffer_width;
+		pDataArray[i]->buffer_height = rc->buffer_height;
+		pDataArray[i]->y_offset = i*rc->buffer_height / MAX_THREADS;
+		pDataArray[i]->num_rows_to_render = rc->buffer_height / MAX_THREADS;
 		pDataArray[i]->world = rc->world;
 		pDataArray[i]->samples = rc->samples;
 
@@ -195,10 +195,10 @@ bool threadRenderer::renderSection(PRENDERCONTEXT rc)
 	for (int i = 0; i<MAX_THREADS; i++)
 	{
 		pDataArray[i]->buffer = rc->buffer;
-		pDataArray[i]->bufferx = rc->bufferx;
-		pDataArray[i]->buffery = rc->buffery;
-		pDataArray[i]->rendery = i*rc->buffery / MAX_THREADS;
-		pDataArray[i]->sizey = rc->buffery / MAX_THREADS;
+		pDataArray[i]->buffer_width = rc->buffer_width;
+		pDataArray[i]->buffer_height = rc->buffer_height;
+		pDataArray[i]->y_offset = i*rc->buffer_height / MAX_THREADS;
+		pDataArray[i]->num_rows_to_render = rc->buffer_height / MAX_THREADS;
 		pDataArray[i]->world = rc->world;
 		pDataArray[i]->samples = rc->samples;
 

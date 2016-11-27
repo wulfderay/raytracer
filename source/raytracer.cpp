@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <chrono>
 
 #include "hitable.h"
 #include "sphere.h"
@@ -11,6 +12,8 @@
 #include "metal.h"
 #include "dielectric.h"
 #include <list>
+
+#include <cstring>
 #include "threads.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
@@ -22,15 +25,12 @@
  #define FLT_MAX std::numeric_limits<float>::max()
 #endif // _WINDOWS_MAGIC
 
+using namespace std::chrono;
+
+RENDERCONTEXT getOptionsFromInput(int argc, char** argv);
+
 int main(int argc, char ** argv)
 {
-	int nx = 600;
-	int ny = 300;
-	if (argc == 3)
-	{
-		nx = std::stoi(argv[1]);
-		ny = std::stoi(argv[2]);
-	}
 
 	std::list<hitable*> list;
 	list.push_back( new sphere(vec3(0, 0, -2.0), 0.5, new lambertian(vec3(0.8, 0.3, 0.3))));
@@ -39,27 +39,72 @@ int main(int argc, char ** argv)
 	list.push_back(new sphere(vec3(.2, -.2, -.8), 0.2, new dielectric( 1.5)));
 	hitable * world = new hitable_list(list);
 
-	vec3 * buffer = new vec3[nx*ny];
-	threadRenderer renderer = threadRenderer();
-	RENDERCONTEXT rc;
-	rc.buffer = buffer;
-	rc.bufferx = nx;
-	rc.buffery = ny;
-	rc.rendery = 0;
-	rc.sizey = ny;
+
+	auto rc = getOptionsFromInput(argc, argv);
+	rc.y_offset = 0;
+	rc.num_rows_to_render = rc.buffer_height;
 	rc.world = world;
-	rc.samples = 500;
+
+	std::cout << "Starting Render..." << std::endl;
+	milliseconds start = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+	threadRenderer renderer = threadRenderer();
 	renderer.renderSection(&rc);
-	uint8_t * raw_buffer= new uint8_t[nx*ny * 3];
-	for (int i = 0; i < nx*ny; i++)
+	milliseconds end = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+
+	auto total_ms = (end - start).count();
+
+	std::cout << "Total durations " << total_ms / 1000 << "." << total_ms % 1000 << "s" << std::endl;;
+	uint8_t * raw_buffer= new uint8_t[rc.buffer_width*rc.buffer_height * 3];
+	for (int i = 0; i < rc.buffer_width*rc.buffer_height; i++)
 	{
-		raw_buffer[i * 3] = buffer[i].r();
-		raw_buffer[(i * 3) + 1] = buffer[i].g();
-		raw_buffer[(i * 3) + 2] = buffer[i].b();
+		raw_buffer[i * 3] = rc.buffer[i].r();
+		raw_buffer[(i * 3) + 1] = rc.buffer[i].g();
+		raw_buffer[(i * 3) + 2] = rc.buffer[i].b();
 	}
 	
 
-	stbi_write_png("out.png", nx, ny, 3, raw_buffer, 0);
+	stbi_write_png(rc.filename, rc.buffer_width, rc.buffer_height, 3, raw_buffer, 0);
 	return 0;
 }
 
+
+RENDERCONTEXT getOptionsFromInput(int argc, char** argv) // hmm.. what about filename? 
+{
+
+	RENDERCONTEXT rc;
+	rc.buffer_height = 200;
+	rc.buffer_width = 400;
+	rc.samples = 100;
+	rc.filename ="out.png";
+
+	for (auto i = 1; i <argc-1; i ++) 
+	{
+		if (!strcmp(argv[i], "-h")) // height
+		{
+			rc.buffer_height = std::stoi(argv[i+1]);
+			++i;
+			continue;
+		}
+		if (!strcmp(argv[i], "-w"))
+		{
+			rc.buffer_width = std::stoi(argv[i + 1]);
+			++i;
+			continue;
+		}
+		if (!strcmp(argv[i], "-s"))
+		{
+			rc.samples = std::stoi(argv[i + 1]);
+			++i;
+			continue;
+		}
+		if (!strcmp(argv[i], "-f"))
+		{
+			rc.filename = argv[i + 1];
+			++i;
+			continue;
+		}
+		// Unknown parameter. print usage and exit.
+	}
+	rc.buffer = new vec3[rc.buffer_height*rc.buffer_width];
+	return rc;
+}
