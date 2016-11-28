@@ -18,6 +18,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 #include "constant_texture.h"
+#include "checker_texture.h"
 
 #ifdef _WIN32
 #include "stdafx.h"
@@ -34,8 +35,11 @@ int main(int argc, char ** argv)
 {
 
 	std::list<hitable*> list;
+	texture *checker = new checker_texture(
+		new constant_texture(vec3(0.2, 0.3, 0.1)),
+		new constant_texture(vec3(0.9, 0.9, 0.9)));
+	list.push_back(new sphere(vec3(0, -100.5, -1), 100, new lambertian(checker)));
 	list.push_back( new sphere(vec3(0, 0, -2.0), 0.5, new lambertian(new constant_texture(vec3(0.8, 0.3, 0.3)))));
-	list.push_back( new sphere(vec3(0, -100.5, -1), 100, new lambertian(new constant_texture(vec3(0.2, 0.2, 0.6)))));
 	list.push_back(new sphere(vec3(1, 0, -1), 0.5, new metal(vec3(0.8, 0.8, 0.8), 0.0)));
 	list.push_back(new sphere(vec3(.2, -.2, -.8), 0.2, new dielectric( 1.5)));
 	hitable * world = new hitable_list(list);
