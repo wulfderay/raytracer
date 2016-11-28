@@ -83,8 +83,8 @@ bool threadRenderer::renderSection(PRENDERCONTEXT rc)
 		pDataArray[i]->buffer = rc->buffer;
 		pDataArray[i]->buffer_width = rc->buffer_width;
 		pDataArray[i]->buffer_height = rc->buffer_height;
-		pDataArray[i]->y_offset = i*rc->buffer_height / MAX_THREADS;
-		pDataArray[i]->num_rows_to_render = rc->buffer_height / MAX_THREADS;
+		pDataArray[i]->y_offset = i*rc->buffer_height / num_threads;
+		pDataArray[i]->num_rows_to_render = rc->buffer_height / num_threads;
 		pDataArray[i]->world = rc->world;
 		pDataArray[i]->samples = rc->samples;
 
