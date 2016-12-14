@@ -5,7 +5,6 @@
 #include "hitable.h"
 #include "sphere.h"
 #include "hitablelist.h"
-#include <limits>
 #include <string>
 #include <random>
 #include "lambertian.h"
@@ -13,12 +12,13 @@
 #include "dielectric.h"
 #include <list>
 
-#include <cstring>
 #include "threads.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 #include "constant_texture.h"
 #include "checker_texture.h"
+#include "camera.h"
+#include "light.h"
 
 #ifdef _WIN32
 #include "stdafx.h"
@@ -39,16 +39,26 @@ int main(int argc, char ** argv)
 		new constant_texture(vec3(0.2, 0.3, 0.1)),
 		new constant_texture(vec3(0.9, 0.9, 0.9)));
 	list.push_back(new sphere(vec3(0, -100.5, -1), 100, new lambertian(checker)));
-	list.push_back( new sphere(vec3(0, 0, -2.0), 0.5, new lambertian(new constant_texture(vec3(0.8, 0.3, 0.3)))));
+	//list.push_back( new sphere(vec3(0, 0, -2.0), 0.5, new lambertian(new constant_texture(vec3(0.8, 0.3, 0.3)))));
+	list.push_back( new sphere(vec3(0, 0, -2.0), 0.5, new diffuse_light(new constant_texture(vec3(1, 1, 1)))));
 	list.push_back(new sphere(vec3(1, 0, -1), 0.5, new metal(vec3(0.8, 0.8, 0.8), 0.0)));
 	list.push_back(new sphere(vec3(.2, -.2, -.8), 0.2, new dielectric( 1.5)));
 	hitable * world = new hitable_list(list);
 
+	
 
 	auto rc = getOptionsFromInput(argc, argv);
 	rc.y_offset = 0;
 	rc.num_rows_to_render = rc.buffer_height;
 	rc.world = world;
+
+	vec3 lookfrom = vec3(-1, 0.2, 1);
+	vec3 lookat = vec3(.2, -.2, -.8);
+	float dist_to_focus = (lookfrom - lookat).length();
+	float aperture = 0.01;
+	camera cam(lookfrom, lookat, vec3(0, 1, 0), 20, float(rc.buffer_width) / float(rc.buffer_height), aperture, dist_to_focus);
+
+	rc.cam = &cam;
 
 	std::cout << "Starting Render..." << std::endl;
 	milliseconds start = duration_cast<milliseconds>(system_clock::now().time_since_epoch());

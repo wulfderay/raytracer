@@ -15,12 +15,7 @@ rendered because otherwise we won't write things in the right order.
 */
 
 bool renderByThread(PRENDERCONTEXT rc)
-{
-    vec3 lookfrom = vec3(-1, 2, 1);
-	vec3 lookat = vec3(.2, -.2, -.8);
-	float dist_to_focus = (lookfrom - lookat).length();
-	float aperture = 1.0;
-	camera cam(lookfrom, lookat, vec3(0, 1, 0), 20, float(rc->buffer_width) / float(rc->buffer_height), aperture, dist_to_focus);
+{	
 	for (int j = rc->y_offset; j < rc->num_rows_to_render + rc->y_offset; j++)
 	{
 		for (int i = 0; i < rc->buffer_width; i++)
@@ -30,7 +25,7 @@ bool renderByThread(PRENDERCONTEXT rc)
 			{
 				float u = float(i + float(rand()) / RAND_MAX) / float(rc->buffer_width);
 				float v = float(j + float(rand()) / RAND_MAX) / float(rc->buffer_height);
-				ray r = cam.get_ray(u, v);
+				ray r = rc->cam->get_ray(u, v);
 				col += color(r, rc->world, 0);
 			}
 			col /= float(rc->samples);
@@ -87,6 +82,7 @@ bool threadRenderer::renderSection(PRENDERCONTEXT rc)
 		pDataArray[i]->num_rows_to_render = rc->buffer_height / num_threads;
 		pDataArray[i]->world = rc->world;
 		pDataArray[i]->samples = rc->samples;
+		pDataArray[i]->cam = rc->cam;
 
 		// Create the thread to begin execution on its own.
 

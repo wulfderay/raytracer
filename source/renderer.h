@@ -1,5 +1,6 @@
 #pragma once
 #include "hitable.h"
+#include "camera.h"
 
 
 typedef struct RenderContext {
@@ -11,6 +12,7 @@ typedef struct RenderContext {
 	const hitable * world;
 	int samples = 100;
 	char * filename;
+	camera * cam;
 	// probably want something to do with the camera?
 } RENDERCONTEXT, *PRENDERCONTEXT;
 

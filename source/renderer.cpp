@@ -12,12 +12,11 @@ vec3 color(const ray& r, const hitable *world, int max_depth)
 	{
 		ray scattered;
 		vec3 attenuation;
+		vec3 emitted = rec.mat_ptr->emitted(rec.u, rec.v, rec.p);
 		if (max_depth < 50 && rec.mat_ptr->scatter(r, rec, attenuation, scattered)) {
-			return attenuation*color(scattered, world, max_depth + 1);
+			return emitted + attenuation*color(scattered, world, max_depth + 1);
 		}
-		return vec3(0, 0, 0);
+		return emitted;
 	}
-	vec3 unit_direction = unit_vector(r.direction());
-	float t = 0.5*(unit_direction.y() + 1.0);
-	return (1.0f - t)* vec3(1.0, 1.0, 1.0) + t*vec3(0.5, 0.7, 1.0);
+	return vec3(0, 0, 0);
 }
