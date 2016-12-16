@@ -97,6 +97,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\box.cpp" />
     <ClCompile Include="source\bvh.cpp" />
     <ClCompile Include="source\camera.cpp" />
     <ClCompile Include="source\material.cpp" />
@@ -107,6 +108,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\aabb.h" />
+    <ClInclude Include="Source\box.h" />
     <ClInclude Include="source\bvh.h" />
     <ClInclude Include="source\camera.h" />
     <ClInclude Include="source\checker_texture.h" />

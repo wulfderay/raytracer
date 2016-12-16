@@ -19,6 +19,7 @@
 #include "checker_texture.h"
 #include "camera.h"
 #include "light.h"
+#include "box.h"
 
 #ifdef _WIN32
 #include "stdafx.h"
@@ -30,6 +31,7 @@
 using namespace std::chrono;
 
 RENDERCONTEXT getOptionsFromInput(int argc, char** argv);
+uint8_t clamp(float value);
 
 int main(int argc, char ** argv)
 {
@@ -40,9 +42,11 @@ int main(int argc, char ** argv)
 		new constant_texture(vec3(0.9, 0.9, 0.9)));
 	list.push_back(new sphere(vec3(0, -100.5, -1), 100, new lambertian(checker)));
 	//list.push_back( new sphere(vec3(0, 0, -2.0), 0.5, new lambertian(new constant_texture(vec3(0.8, 0.3, 0.3)))));
-	list.push_back( new sphere(vec3(0, 0, -2.0), 0.5, new diffuse_light(new constant_texture(vec3(1, 1, 1)))));
+	list.push_back(new xy_rect(3, 5, 1, 3, -2, new diffuse_light(new constant_texture(vec3(4, 4, 4)))));
+	//list.push_back( new sphere(vec3(1, 2, 0), 0.5, new diffuse_light(new constant_texture(vec3(3.1, 3.1, 3.1)))));
+	//list.push_back(new sphere(vec3(0, 1.5, -1), 1, new diffuse_light(new constant_texture(vec3(3.1, 3.1, 3.5)))));
 	list.push_back(new sphere(vec3(1, 0, -1), 0.5, new metal(vec3(0.8, 0.8, 0.8), 0.0)));
-	list.push_back(new sphere(vec3(.2, -.2, -.8), 0.2, new dielectric( 1.5)));
+	list.push_back(new sphere(vec3(.2, -.2, -.8), 0.2, new dielectric(1.5)));
 	hitable * world = new hitable_list(list);
 
 	
@@ -72,14 +76,23 @@ int main(int argc, char ** argv)
 	uint8_t * raw_buffer= new uint8_t[rc.buffer_width*rc.buffer_height * 3];
 	for (int i = 0; i < rc.buffer_width*rc.buffer_height; i++)
 	{
-		raw_buffer[i * 3] = rc.buffer[i].r();
-		raw_buffer[(i * 3) + 1] = rc.buffer[i].g();
-		raw_buffer[(i * 3) + 2] = rc.buffer[i].b();
+		raw_buffer[i * 3] = clamp(rc.buffer[i].r());
+		raw_buffer[(i * 3) + 1] = clamp(rc.buffer[i].g());
+		raw_buffer[(i * 3) + 2] = clamp(rc.buffer[i].b());
 	}
 	
 
 	stbi_write_png(rc.filename, rc.buffer_width, rc.buffer_height, 3, raw_buffer, 0);
 	return 0;
+}
+
+uint8_t clamp(float value)
+{
+	if (value > 255)
+		return 255;
+	if (value < 0)
+		return 255;
+	return value;
 }
 
 void printUsageAndExit(const char * progname)
