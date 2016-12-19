@@ -105,6 +105,7 @@
     <ClCompile Include="source\renderer.cpp" />
     <ClCompile Include="source\stdafx.cpp" />
     <ClCompile Include="source\threads.cpp" />
+    <ClCompile Include="source\transformation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\aabb.h" />
@@ -128,6 +129,7 @@
     <ClInclude Include="source\targetver.h" />
     <ClInclude Include="source\texture.h" />
     <ClInclude Include="source\threads.h" />
+    <ClInclude Include="source\transformation.h" />
     <ClInclude Include="source\vec3.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

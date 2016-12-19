@@ -11,6 +11,7 @@
 #include "metal.h"
 #include "dielectric.h"
 #include <list>
+#include "transformation.h"
 
 #include "threads.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -33,21 +34,42 @@ using namespace std::chrono;
 RENDERCONTEXT getOptionsFromInput(int argc, char** argv);
 uint8_t clamp(float value);
 
+
+std::list<hitable*> cornel_box() {
+	std::list<hitable*> list;
+	material * red = new lambertian(new constant_texture(vec3(0.65, 0.05,0.05)));
+	material * white = new lambertian(new constant_texture(vec3(0.73, 0.73, 0.73)));
+	material * green = new lambertian(new constant_texture(vec3(0.12, 0.45, 0.15)));
+	material * light = new diffuse_light(new constant_texture(vec3(15, 15, 15)));
+	list.push_back(new flip_normals(new yz_rect(0, 555, 0, 555, 555, green)));
+	list.push_back(new yz_rect(0, 555, 0, 555, 0, red));
+	list.push_back(new xz_rect(213, 343, 227, 332, 554, light));
+	list.push_back(new flip_normals(new xz_rect(0, 555, 0, 555, 555, white)));
+	list.push_back(new xz_rect(0, 555, 0, 555, 0, white));
+	list.push_back(new flip_normals(new xy_rect(0, 555, 0, 555, 555, white)));
+	return list;
+}
+
+
+
 int main(int argc, char ** argv)
 {
-
+	/*
 	std::list<hitable*> list;
 	texture *checker = new checker_texture(
 		new constant_texture(vec3(0.2, 0.3, 0.1)),
 		new constant_texture(vec3(0.9, 0.9, 0.9)));
 	list.push_back(new sphere(vec3(0, -100.5, -1), 100, new lambertian(checker)));
 	//list.push_back( new sphere(vec3(0, 0, -2.0), 0.5, new lambertian(new constant_texture(vec3(0.8, 0.3, 0.3)))));
-	list.push_back(new xy_rect(3, 5, 1, 3, -2, new diffuse_light(new constant_texture(vec3(4, 4, 4)))));
+	list.push_back(new xy_rect(-1, 40, -4, 20, -10, new diffuse_light(new constant_texture(vec3(4, 4, 4)))));
 	//list.push_back( new sphere(vec3(1, 2, 0), 0.5, new diffuse_light(new constant_texture(vec3(3.1, 3.1, 3.1)))));
 	//list.push_back(new sphere(vec3(0, 1.5, -1), 1, new diffuse_light(new constant_texture(vec3(3.1, 3.1, 3.5)))));
-	list.push_back(new sphere(vec3(1, 0, -1), 0.5, new metal(vec3(0.8, 0.8, 0.8), 0.0)));
+	list.push_back(new sphere(vec3(1, 0, -1), 0.5, new lambertian(new constant_texture(vec3(1.0, 0.2, 0.2)))));
 	list.push_back(new sphere(vec3(.2, -.2, -.8), 0.2, new dielectric(1.5)));
-	hitable * world = new hitable_list(list);
+
+	*/
+
+	hitable * world = new hitable_list(cornel_box());
 
 	
 
@@ -56,11 +78,12 @@ int main(int argc, char ** argv)
 	rc.num_rows_to_render = rc.buffer_height;
 	rc.world = world;
 
-	vec3 lookfrom = vec3(-1, 0.2, 1);
-	vec3 lookat = vec3(.2, -.2, -.8);
-	float dist_to_focus = (lookfrom - lookat).length();
-	float aperture = 0.01;
-	camera cam(lookfrom, lookat, vec3(0, 1, 0), 20, float(rc.buffer_width) / float(rc.buffer_height), aperture, dist_to_focus);
+	vec3 lookfrom = vec3(278, 278, -800);
+	vec3 lookat = vec3(278, 278, 0);
+	float dist_to_focus = 10;// (lookfrom - lookat).length();
+	float aperture = 0.0;
+	float vfov = 40;
+	camera cam(lookfrom, lookat, vec3(0, 1, 0), vfov, float(rc.buffer_width) / float(rc.buffer_height), aperture, dist_to_focus);
 
 	rc.cam = &cam;
 
