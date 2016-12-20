@@ -221,7 +221,7 @@ static int stbi__start_write_file(stbi__write_context *s, const char *filename)
 {
    FILE *f = fopen(filename, "wb");
    stbi__start_write_callbacks(s, stbi__stdio_write, (void *) f);
-   return f != NULL;
+   return f != nullptr;
 }
 
 static void stbi__end_write_file(stbi__write_context *s)
@@ -603,7 +603,7 @@ void stbiw__write_hdr_scanline(stbi__write_context *s, int width, int ncomp, uns
 
 static int stbi_write_hdr_core(stbi__write_context *s, int x, int y, int comp, float *data)
 {
-   if (y <= 0 || x <= 0 || data == NULL)
+   if (y <= 0 || x <= 0 || data == nullptr)
       return 0;
    else {
       // Each component is stored separately. Allocate scratch space for full output scanline.
@@ -736,7 +736,7 @@ unsigned char * stbi_zlib_compress(unsigned char *data, int data_len, int *out_l
    static unsigned char  disteb[]  = { 0,0,0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13 };
    unsigned int bitbuf=0;
    int i,j, bitcount=0;
-   unsigned char *out = NULL;
+   unsigned char *out = nullptr;
    unsigned char ***hash_table = (unsigned char***) STBIW_MALLOC(stbiw__ZHASH * sizeof(char**));
    if (quality < 5) quality = 5;
 
@@ -746,13 +746,13 @@ unsigned char * stbi_zlib_compress(unsigned char *data, int data_len, int *out_l
    stbiw__zlib_add(1,2);  // BTYPE = 1 -- fixed huffman
 
    for (i=0; i < stbiw__ZHASH; ++i)
-      hash_table[i] = NULL;
+      hash_table[i] = nullptr;
 
    i=0;
    while (i < data_len-3) {
       // hash next 3 bytes of data to be compressed
       int h = stbiw__zhash(data+i)&(stbiw__ZHASH-1), best=3;
-      unsigned char *bestloc = 0;
+      unsigned char *bestloc = nullptr;
       unsigned char **hlist = hash_table[h];
       int n = stbiw__sbcount(hlist);
       for (j=0; j < n; ++j) {
@@ -777,7 +777,7 @@ unsigned char * stbi_zlib_compress(unsigned char *data, int data_len, int *out_l
             if (hlist[j]-data > i-32767) {
                int e = stbiw__zlib_countm(hlist[j], data+i+1, data_len-i-1);
                if (e > best) { // if next match is better, bail on current match
-                  bestloc = NULL;
+                  bestloc = nullptr;
                   break;
                }
             }
@@ -907,8 +907,8 @@ unsigned char *stbi_write_png_to_mem(unsigned char *pixels, int stride_bytes, in
    if (stride_bytes == 0)
       stride_bytes = x * n;
 
-   filt = (unsigned char *) STBIW_MALLOC((x*n+1) * y); if (!filt) return 0;
-   line_buffer = (signed char *) STBIW_MALLOC(x * n); if (!line_buffer) { STBIW_FREE(filt); return 0; }
+   filt = (unsigned char *) STBIW_MALLOC((x*n+1) * y); if (!filt) return nullptr;
+   line_buffer = (signed char *) STBIW_MALLOC(x * n); if (!line_buffer) { STBIW_FREE(filt); return nullptr; }
    for (j=0; j < y; ++j) {
       static int mapping[] = { 0,1,2,3,4 };
       static int firstmap[] = { 0,1,0,5,6 };
@@ -952,11 +952,11 @@ unsigned char *stbi_write_png_to_mem(unsigned char *pixels, int stride_bytes, in
    STBIW_FREE(line_buffer);
    zlib = stbi_zlib_compress(filt, y*( x*n+1), &zlen, 8); // increase 8 to get smaller but use more memory
    STBIW_FREE(filt);
-   if (!zlib) return 0;
+   if (!zlib) return nullptr;
 
    // each tag requires 12 bytes of overhead
    out = (unsigned char *) STBIW_MALLOC(8 + 12+13 + 12+zlen + 12);
-   if (!out) return 0;
+   if (!out) return nullptr;
    *out_len = 8 + 12+13 + 12+zlen + 12;
 
    o=out;
@@ -994,7 +994,7 @@ STBIWDEF int stbi_write_png(char const *filename, int x, int y, int comp, const 
    FILE *f;
    int len;
    unsigned char *png = stbi_write_png_to_mem((unsigned char *) data, stride_bytes, x, y, comp, &len);
-   if (png == NULL) return 0;
+   if (png == nullptr) return 0;
    f = fopen(filename, "wb");
    if (!f) { STBIW_FREE(png); return 0; }
    fwrite(png, 1, len, f);
@@ -1008,7 +1008,7 @@ STBIWDEF int stbi_write_png_to_func(stbi_write_func *func, void *context, int x,
 {
    int len;
    unsigned char *png = stbi_write_png_to_mem((unsigned char *) data, stride_bytes, x, y, comp, &len);
-   if (png == NULL) return 0;
+   if (png == nullptr) return 0;
    func(context, png, len);
    STBIW_FREE(png);
    return 1;

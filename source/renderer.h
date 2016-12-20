@@ -1,16 +1,19 @@
 #pragma once
 #include "hitable.h"
+#include "camera.h"
 
 
 typedef struct RenderContext {
 	vec3* buffer;
-	int bufferx;
-	int buffery;
-	int rendery;
-	int sizey;
+	int buffer_width;
+	int buffer_height;
+	int y_offset;
+	int num_rows_to_render;
 	const hitable * world;
 	int samples = 100;
-	// probably want something to do with the camera?
+	char * filename;
+	int cores = 0;
+	camera * cam;
 } RENDERCONTEXT, *PRENDERCONTEXT;
 
 

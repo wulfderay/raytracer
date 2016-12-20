@@ -97,6 +97,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\box.cpp" />
     <ClCompile Include="source\bvh.cpp" />
     <ClCompile Include="source\camera.cpp" />
     <ClCompile Include="source\material.cpp" />
@@ -104,15 +105,20 @@
     <ClCompile Include="source\renderer.cpp" />
     <ClCompile Include="source\stdafx.cpp" />
     <ClCompile Include="source\threads.cpp" />
+    <ClCompile Include="source\transformation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\aabb.h" />
+    <ClInclude Include="Source\box.h" />
     <ClInclude Include="source\bvh.h" />
     <ClInclude Include="source\camera.h" />
+    <ClInclude Include="source\checker_texture.h" />
+    <ClInclude Include="source\constant_texture.h" />
     <ClInclude Include="source\dielectric.h" />
     <ClInclude Include="source\hitable.h" />
     <ClInclude Include="source\hitablelist.h" />
     <ClInclude Include="source\lambertian.h" />
+    <ClInclude Include="source\light.h" />
     <ClInclude Include="source\material.h" />
     <ClInclude Include="source\metal.h" />
     <ClInclude Include="source\ray.h" />
@@ -121,7 +127,9 @@
     <ClInclude Include="source\stb_image_write.h" />
     <ClInclude Include="source\stdafx.h" />
     <ClInclude Include="source\targetver.h" />
+    <ClInclude Include="source\texture.h" />
     <ClInclude Include="source\threads.h" />
+    <ClInclude Include="source\transformation.h" />
     <ClInclude Include="source\vec3.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
