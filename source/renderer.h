@@ -12,8 +12,8 @@ typedef struct RenderContext {
 	const hitable * world;
 	int samples = 100;
 	char * filename;
+	int cores = 0;
 	camera * cam;
-	// probably want something to do with the camera?
 } RENDERCONTEXT, *PRENDERCONTEXT;
 
 

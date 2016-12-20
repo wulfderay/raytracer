@@ -1,5 +1,6 @@
 #pragma once
 #include "hitable.h"
+#include <list>
 
 class xy_rect: public hitable
 {
@@ -61,7 +62,10 @@ public:
 class box : public hitable
 {
 public:
-	box(float x0, float y0, float z0, float x1, float y1, float z1, material * mat);
+	box::box(vec3 min, vec3 max, material* mat);
 	bool hit(const ray& r, float t_min, float t_max, hit_record& rec) const override; // hmm.. not hitting it....
-	bool bounding_box(float t0, float t1, aabb& box) const override
+	bool bounding_box(float t0, float t1, aabb& box) const override;
+private:
+	std::list<hitable *> sides;
+	aabb bounds;
 };

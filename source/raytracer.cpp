@@ -40,16 +40,24 @@ std::list<hitable*> cornel_box() {
 	material * red = new lambertian(new constant_texture(vec3(0.65, 0.05,0.05)));
 	material * white = new lambertian(new constant_texture(vec3(0.73, 0.73, 0.73)));
 	material * green = new lambertian(new constant_texture(vec3(0.12, 0.45, 0.15)));
-	material * light = new diffuse_light(new constant_texture(vec3(15, 15, 15)));
+	material * black = new lambertian(new constant_texture(vec3(0.15, 0.15, 0.15)));
+	material * light = new diffuse_light(new constant_texture(vec3(10, 10, 10)));
+	material * metal_mat = new metal(vec3(1,1,1),0.3);
 	list.push_back(new flip_normals(new yz_rect(0, 555, 0, 555, 555, green)));
 	list.push_back(new yz_rect(0, 555, 0, 555, 0, red));
-	list.push_back(new xz_rect(213, 343, 227, 332, 554, light));
+	list.push_back(new xz_rect(150, 400, 150, 400, 554, light));
 	list.push_back(new flip_normals(new xz_rect(0, 555, 0, 555, 555, white)));
 	list.push_back(new xz_rect(0, 555, 0, 555, 0, white));
 	list.push_back(new flip_normals(new xy_rect(0, 555, 0, 555, 555, white)));
+	list.push_back(new box(vec3(255, 0, 300), vec3(455, 300, 500), black));
+	list.push_back(new box(vec3(100, 0, 10),vec3( 300, 100, 200), white));
+	list.push_back(new sphere(vec3(200, 200, 150), 100, new dielectric(1.5)));
+	list.push_back(new sphere(vec3(355, 350, 400), 50, metal_mat));
 	return list;
 }
+ 
 
+// can nyquist limit help with supersampling?
 
 
 int main(int argc, char ** argv)
@@ -125,7 +133,7 @@ void printUsageAndExit(const char * progname)
 	exit(EXIT_FAILURE);
 }
 
-RENDERCONTEXT getOptionsFromInput(int argc, char** argv) // hmm.. what about filename? 
+RENDERCONTEXT getOptionsFromInput(int argc, char** argv)
 {
 
 	RENDERCONTEXT rc;
@@ -159,6 +167,12 @@ RENDERCONTEXT getOptionsFromInput(int argc, char** argv) // hmm.. what about fil
 		if (!strcmp(argv[i], "-f"))
 		{
 			rc.filename = argv[i + 1];
+			++i;
+			continue;
+		}
+		if (!strcmp(argv[i], "-c"))
+		{
+			rc.cores = std::stoi(argv[i + 1]);
 			++i;
 			continue;
 		}

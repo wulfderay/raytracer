@@ -6,7 +6,7 @@
 
 class metal : public material {
 public:
-	metal(const vec3& a, float f) :albedo(a) { if (f < 1) fuzziness = f; else fuzziness = 1; }
+	metal(const vec3& a, float _fuzziness) :albedo(a) { if (_fuzziness < 1) fuzziness = _fuzziness; else fuzziness = 1; }
 
 	bool scatter(const ray& r_in, const hit_record& rec, vec3& attenuation, ray& scattered) const override
 	{

@@ -1,4 +1,5 @@
 #include "box.h"
+#include "transformation.h"
 
 bool xy_rect::hit(const ray& r, float t_min, float t_max, hit_record& rec) const
 {
@@ -55,4 +56,39 @@ bool yz_rect::hit(const ray& r, float t_min, float t_max, hit_record& rec) const
 	rec.normal = vec3(1, 0, 0);
 	return true;
 
+}
+
+box::box( vec3 min, vec3 max, material* mat)
+{
+	sides.push_back(new xy_rect(min.x(), max.x(), min.y(), max.y(), min.z(), mat));
+	sides.push_back(new xy_rect(min.x(), max.x(), min.y(), max.y(), max.z(), mat));
+	sides.push_back(new xz_rect(min.x(), max.x(), min.z(), max.z(), min.y(), mat));
+	sides.push_back(new xz_rect(min.x(), max.x(), min.z(), max.z(), max.y(), mat));
+	sides.push_back(new yz_rect(min.y(), max.y(), min.z(), max.z(), min.x(), mat));
+	sides.push_back(new yz_rect(min.y(), max.y(), min.z(), max.z(), max.x(), mat));
+	bounds = aabb(min, max);
+}
+
+bool box::hit(const ray& r, float t_min, float t_max, hit_record& rec) const
+{
+	hit_record closest_hit;
+	auto has_hit = false;
+	for (auto side : sides)
+	{
+		if (side->hit(r, t_min, t_max, closest_hit))  // make sure we return the closest hit.
+		{
+			if (!has_hit || closest_hit.t < rec.t)
+			{
+				rec = closest_hit;
+				has_hit = true;
+			}
+		}
+	}
+	return has_hit;
+}
+
+bool box::bounding_box(float t0, float t1, aabb& box) const
+{
+	box = bounds;
+	return true;
 }

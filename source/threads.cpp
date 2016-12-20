@@ -21,6 +21,7 @@ bool renderByThread(PRENDERCONTEXT rc)
 		for (int i = 0; i < rc->buffer_width; i++)
 		{
 			vec3 col(0, 0, 0);
+			//  currently using stohastic multisampling... we should probably swithc to adaptive.
 			for (int s = 0; s < rc->samples; s++)
 			{
 				float u = float(i + float(rand()) / RAND_MAX) / float(rc->buffer_width);
@@ -29,6 +30,8 @@ bool renderByThread(PRENDERCONTEXT rc)
 				col += color(r, rc->world, 0);
 			}
 			col /= float(rc->samples);
+		
+			
 			col = vec3(int(255.99 *sqrt(col[0])), int(255.99 *sqrt(col[1])), int(255.99 *sqrt(col[2])));
 
 			rc->buffer[((rc->buffer_height - j - 1)*rc->buffer_width) + i] = col;
@@ -51,7 +54,7 @@ void ErrorHandler(LPTSTR lpszFunction);
 bool threadRenderer::renderSection(PRENDERCONTEXT rc)
 {
 	//TODO:  alter this to only render the sectoin specified.
-	int num_threads = std::thread::hardware_concurrency();
+	int num_threads = rc->cores>0? min(std::thread::hardware_concurrency(),rc->cores): std::thread::hardware_concurrency();
 	PRENDERCONTEXT pDataArray[MAX_THREADS];
 	DWORD   dwThreadIdArray[MAX_THREADS];
 	HANDLE  hThreadArray[MAX_THREADS];
