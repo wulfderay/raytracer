@@ -1,15 +1,20 @@
 #include "bvh.h"
 
+#include <random>
+/*
+ * Bounding Volume Hierarchy
+ */
 int box_x_compare(const void * a, const void * b) {
 	aabb box_left, box_right;
 	hitable *ah = *(hitable**)a;
 	hitable *bh = *(hitable**)b;
 	if (!ah->bounding_box(0, 0, box_left) || !bh->bounding_box(0, 0, box_right))
 		std::cerr << "no bounding box ion bvh node constructor\n";
-	if (box_left.min().x() - box_right.min().x() < 0.0)
+	if (box_left.min().x() < box_right.min().x())
 		return -1;
-	else
+	if (box_left.min().x() > box_right.min().x())
 		return 1;
+	return 0;
 }
 
 int box_y_compare(const void * a, const void * b) {
@@ -18,10 +23,11 @@ int box_y_compare(const void * a, const void * b) {
 	hitable *bh = *(hitable**)b;
 	if (!ah->bounding_box(0, 0, box_left) || !bh->bounding_box(0, 0, box_right))
 		std::cerr << "no bounding box ion bvh node constructor\n";
-	if (box_left.min().y() - box_right.min().y() < 0.0)
+	if (box_left.min().y() < box_right.min().y())
 		return -1;
-	else
+	if (box_left.min().y() > box_right.min().y())
 		return 1;
+	return 0;
 }
 
 int box_z_compare(const void * a, const void * b) {
@@ -30,24 +36,36 @@ int box_z_compare(const void * a, const void * b) {
 	hitable *bh = *(hitable**)b;
 	if (!ah->bounding_box(0, 0, box_left) || !bh->bounding_box(0, 0, box_right))
 		std::cerr << "no bounding box ion bvh node constructor\n";
-	if (box_left.min().z() - box_right.min().z() < 0.0)
+	if (box_left.min().z() < box_right.min().z())
 		return -1;
-	else
+	if (box_left.min().z() > box_right.min().z())
 		return 1;
+	return 0;
 }
 
 aabb surrounding_box(aabb box0, aabb box1) {
-	vec3 small(fmin(box0.min().x(), box1.min().x()),
+	vec3 small(
+		fmin(box0.min().x(), box1.min().x()),
 		fmin(box0.min().y(), box1.min().y()),
 		fmin(box0.min().z(), box1.min().z()));
-	vec3 big(fmin(box0.max().x(), box1.max().x()),
-		fmin(box0.max().y(), box1.max().y()),
-		fmin(box0.max().z(), box1.max().z()));
+	// this should use fmax, not fmin.
+	vec3 big(
+		fmax(box0.max().x(), box1.max().x()),
+		fmax(box0.max().y(), box1.max().y()),
+		fmax(box0.max().z(), box1.max().z()));
 	return aabb(small, big);
 }
 
+/**
+ * At the moment the bvh is doing a simple random axis splitting algorithm.
+ * In future we should implement something more efficient, like a surface-area optimization.
+ * @param l array of hitables
+ * @param n number of hittables
+ * @param time0
+ * @param time1
+ */
 bvh_node::bvh_node(hitable **l, int n, float time0, float time1) {
-	int axis = int(3 * ((float)rand() / RAND_MAX));
+	int axis = rand() % 3;
 	if (axis == 0)
 		qsort(l, n, sizeof(hitable *), box_x_compare);
 	else if (axis == 1)

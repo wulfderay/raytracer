@@ -1,15 +1,17 @@
 #pragma once
 #include <list>
 #include <iterator>
+#include <vector>
+
 #include "hitable.h"
 
 class hitable_list : public hitable {
 public:
-	hitable_list() {}
-	hitable_list(std::list<hitable*> l) { theList = l; }
+	hitable_list() = delete;
+	hitable_list(std::vector<hitable*> l) { theList = l; }
 	bool hit(const ray& r, float t_min, float t_max, hit_record& rec) const override;
 	bool bounding_box(float t0, float t1, aabb& box) const override;
-	std::list<hitable*> theList;
+	std::vector<hitable*> theList;
 };
 
 inline bool hitable_list::hit(const ray& r, float t_min, float t_max, hit_record& rec) const {

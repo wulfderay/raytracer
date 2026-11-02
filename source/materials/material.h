@@ -1,9 +1,10 @@
 #pragma once
-#include "ray.h"
-#include "hitable.h"
+#include "../engine/ray.h"
+#include "../hitables/hitable.h"
+#include "../math/Random.h"
 struct hit_record;
 
-vec3 random_in_unit_sphere();
+vec3 random_in_unit_sphere(Random& random);
 float schlick(float cosine, float ref_idx);
 vec3 reflect(const vec3 & v, const vec3& n);
 bool refract(const vec3& v, const vec3& n, float ni_over_nt, vec3& refracted);
@@ -14,7 +15,7 @@ public:
 	{
 	}
 
-	virtual bool scatter(const ray& r_in, const hit_record& rec, vec3& attenuation, ray& scattered) const = 0;
+	virtual bool scatter(const ray& r_in, const hit_record& rec, vec3& attenuation, ray& scattered, Random& random) const = 0;
 	virtual vec3 emitted(float u, float v, const vec3& p) const
 	{
 		return vec3(0, 0, 0);

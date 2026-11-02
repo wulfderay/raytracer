@@ -1,5 +1,5 @@
 #pragma once
-#include "hitable.h"
+#include "../hitables/hitable.h"
 #include "camera.h"
 
 
@@ -11,7 +11,8 @@ typedef struct RenderContext {
 	int num_rows_to_render;
 	const hitable * world;
 	int samples = 100;
-	char * filename;
+	std::string filename;
+	std::string object_filename;
 	int cores = 0;
 	camera * cam;
 } RENDERCONTEXT, *PRENDERCONTEXT;
@@ -28,4 +29,4 @@ public:
 };
 
 
-vec3 color(const ray& r, const hitable *world, int max_depth);
+vec3 color(const ray& r, const hitable *world, int max_depth, Random& random);

@@ -1,11 +1,12 @@
 #include "material.h"
 
-vec3 random_in_unit_sphere() {
+
+vec3 random_in_unit_sphere(Random& random) {
 	vec3 p;
 	do {
-		float x = float(rand()) / RAND_MAX;
-		float y = float(rand()) / RAND_MAX;
-		float z = float(rand()) / RAND_MAX;
+		float x = random.uniform();
+		float y = random.uniform();
+		float z = random.uniform();
 		p = 2.0*vec3(x, y, z) - vec3(1, 1, 1);
 	} while (p.squared_length() >= 1.0);
 	return p;

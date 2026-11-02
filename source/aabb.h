@@ -1,6 +1,11 @@
 #pragma once
 
-#include "ray.h"
+#include "engine/ray.h"
+
+/**
+ * Axis-aligned bounding box.
+ */
+
 
 inline float ffmin(float a, float b) { return a < b ? a : b; }
 inline float ffmax(float a, float b) { return a > b ? a : b; }

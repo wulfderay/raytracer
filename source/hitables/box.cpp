@@ -60,11 +60,12 @@ bool yz_rect::hit(const ray& r, float t_min, float t_max, hit_record& rec) const
 
 box::box( vec3 min, vec3 max, material* mat)
 {
-	sides.push_back(new xy_rect(min.x(), max.x(), min.y(), max.y(), min.z(), mat));
+	// the min side faces have flipped normals. We should wrap them as the book does in flip_normals
+	sides.push_back(new flip_normals(new xy_rect(min.x(), max.x(), min.y(), max.y(), min.z(), mat)));
 	sides.push_back(new xy_rect(min.x(), max.x(), min.y(), max.y(), max.z(), mat));
-	sides.push_back(new xz_rect(min.x(), max.x(), min.z(), max.z(), min.y(), mat));
+	sides.push_back(new flip_normals(new xz_rect(min.x(), max.x(), min.z(), max.z(), min.y(), mat)));
 	sides.push_back(new xz_rect(min.x(), max.x(), min.z(), max.z(), max.y(), mat));
-	sides.push_back(new yz_rect(min.y(), max.y(), min.z(), max.z(), min.x(), mat));
+	sides.push_back(new flip_normals(new yz_rect(min.y(), max.y(), min.z(), max.z(), min.x(), mat)));
 	sides.push_back(new yz_rect(min.y(), max.y(), min.z(), max.z(), max.x(), mat));
 	bounds = aabb(min, max);
 }

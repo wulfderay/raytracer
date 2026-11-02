@@ -1,9 +1,10 @@
 #pragma once
 
+#include "../math/Random.h"
 #include "ray.h"
 #define M_PI 3.1415927
 
-vec3 random_in_unit_disc();
+vec3 random_in_unit_disc(Random& random);
 
 class camera {
 public:
@@ -22,9 +23,9 @@ public:
 		horizontal = 2*half_width*focus_dist*u;
 		vertical = 2 * half_height*focus_dist*v;
 	}
-	ray get_ray(float s, float t) const
+	ray get_ray(float s, float t, Random& random) const
 	{
-		vec3 rd = lens_radius* random_in_unit_disc();
+		vec3 rd = lens_radius* random_in_unit_disc(random);
 		vec3 offset = u *rd.x() + v * rd.y();
 		return ray(origin+offset, lower_left_corner + s*horizontal + t*vertical - origin - offset);
 	}

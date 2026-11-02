@@ -1,11 +1,11 @@
 #pragma once
-#include "hitable.h"
+#include "../hitables/hitable.h"
 
 class dielectric : public material {
 public:
 	dielectric(float ri) : ref_idx(ri) {}
 
-	bool scatter(const ray& r_in, const hit_record& rec, vec3& attenuation, ray& scattered) const override
+	bool scatter(const ray& r_in, const hit_record& rec, vec3& attenuation, ray& scattered, Random& random) const override
 	{
 		vec3 outward_normal;
 		vec3 reflected = reflect(r_in.direction(), rec.normal);
@@ -29,7 +29,7 @@ public:
 			reflect_prob = schlick(cosine, ref_idx);
 		else
 			reflect_prob = 1.0;
-		if (float(rand()) / RAND_MAX < reflect_prob)
+		if (random.uniform() < reflect_prob)
 			scattered = ray(rec.p, reflected);
 		else
 			scattered = ray(rec.p, refracted);

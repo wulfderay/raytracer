@@ -1,6 +1,7 @@
 #include "threads.h"
-#include "camera.h"
+#include "engine/camera.h"
 #include <chrono>
+#include <random>
 #include <thread>
 #ifdef _WIN32
 #include "stdafx.h"
@@ -12,10 +13,15 @@ using namespace std::chrono;
 Ok. So to divide this up into threadable chunks, I need to be able to call a function with the state of the scene and a coordinate range to render...
 once the picture is rnedered, the array needs to be written out. one interesting thing is that we need to keep everything in memory until it's all
 rendered because otherwise we won't write things in the right order.
+Hmm, this is SLOWER than single threaded by a large amount. Apparently that's because
+rand() can serialize the threads because it uses shared state protected by a lock
+so ther way to mitigate this is to use <random> and create a generator for each thread.
 */
 
 bool renderByThread(PRENDERCONTEXT rc)
-{	
+{
+	// make a mersenne twister based rng with a seed from some hardware random source
+	Random rng = Random(std::random_device{}());
 	for (int j = rc->y_offset; j < rc->num_rows_to_render + rc->y_offset; j++)
 	{
 		for (int i = 0; i < rc->buffer_width; i++)
@@ -24,10 +30,10 @@ bool renderByThread(PRENDERCONTEXT rc)
 			//  currently using stohastic multisampling... we should probably swithc to adaptive.
 			for (int s = 0; s < rc->samples; s++)
 			{
-				float u = float(i + float(rand()) / RAND_MAX) / float(rc->buffer_width);
-				float v = float(j + float(rand()) / RAND_MAX) / float(rc->buffer_height);
-				ray r = rc->cam->get_ray(u, v);
-				col += color(r, rc->world, 0);
+				float u = float(i + rng.uniform()) / float(rc->buffer_width);
+				float v = float(j + rng.uniform()) / float(rc->buffer_height);
+				ray r = rc->cam->get_ray(u, v, rng);
+				col += color(r, rc->world, 0, rng);
 			}
 			col /= float(rc->samples);
 		
@@ -187,36 +193,44 @@ void *RenderThread(void * param);
 
 bool threadRenderer::renderSection(PRENDERCONTEXT rc)
 {
+	unsigned int num_threads = rc->cores>0? std::min(std::thread::hardware_concurrency(),static_cast<unsigned int>(rc->cores)): std::thread::hardware_concurrency();
 	RENDERCONTEXT pDataArray[MAX_THREADS];
 	pthread_t  hThreadArray[MAX_THREADS];
 
 	// Create MAX_THREADS worker threads.
-
-	for (int i = 0; i<MAX_THREADS; i++)
+	std::cout << "Creating " << num_threads << " threads" << std::endl;
+	for (int i = 0; i < num_threads; i++)
 	{
-		pDataArray[i]->buffer = rc->buffer;
-		pDataArray[i]->buffer_width = rc->buffer_width;
-		pDataArray[i]->buffer_height = rc->buffer_height;
-		pDataArray[i]->y_offset = i*rc->buffer_height / num_threads;
-		pDataArray[i]->num_rows_to_render = rc->buffer_height / num_threads;
-		pDataArray[i]->world = rc->world;
-		pDataArray[i]->samples = rc->samples;
+		pDataArray[i].buffer = rc->buffer;
+		pDataArray[i].buffer_width = rc->buffer_width;
+		pDataArray[i].buffer_height = rc->buffer_height;
+		pDataArray[i].y_offset = i * rc->buffer_height / num_threads;
+
+		int end_row = (i + 1) * rc->buffer_height / num_threads;
+
+		pDataArray[i].num_rows_to_render = end_row - pDataArray[i].y_offset;
+		pDataArray[i].world = rc->world;
+		pDataArray[i].samples = rc->samples;
+		pDataArray[i].cam = rc->cam;
 
 		// Create the thread to begin execution on its own.
 
 		int ret = pthread_create(&hThreadArray[i], NULL, RenderThread, (void*)(&pDataArray[i]));
 
 
-		if (hThreadArray[i] == NULL)
+		if (ret != 0)
 		{
-			// error.
+			return false;
+			// Handle thread creation failure.
 		}
 	} // End of main thread creation loop.
 
-	for (int i = 0; i<MAX_THREADS; i++)
+	for (unsigned int i = 0; i < num_threads; i++)
 	{
 		pthread_join(hThreadArray[i], NULL);
 	}
+
+	return true;
 
 }
 
@@ -225,7 +239,7 @@ bool threadRenderer::renderSection(PRENDERCONTEXT rc)
 void *RenderThread(void * param)
 {
 	//HANDLE hStdout;
-	PRENDERCONTEXT pRenderContext = (PRENDERCONTEXT)param;
+	auto pRenderContext = (PRENDERCONTEXT)param;
 	// now I know that passing a pointer to a buffer into a thread is not threadsafe, but given that the threads will all be accessing different parts of the buffer, it should be fine.
 	renderByThread(pRenderContext);
 	return 0; // this is probs wron g.

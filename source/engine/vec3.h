@@ -17,8 +17,8 @@ public:
 
 	inline const vec3& operator+() const { return *this; };
 	inline vec3 operator-() const { return vec3(-e[0], -e[1], -e[2]); };
-	inline float operator[](int i) const { return e[i]; };
-	//inline float& operator[](int i) const { return e[i]; };
+	//inline float operator[](int i) const { return e[i]; };
+	inline float& operator[](int i) { return e[i]; };
 
 	inline vec3& operator +=(const vec3 &v2);
 	inline vec3& operator -=(const vec3 &v2);
@@ -48,7 +48,10 @@ inline std::ostream& operator <<(std::ostream &os, vec3 &t) {
 }
 
 inline void vec3::make_unit_vector() {
-	float k = 1.0 / sqrt(e[0] * e[0] + e[1] * e[1] + e[1] * e[1]);
+	float k = 1.0 / sqrt(
+		e[0] * e[0]
+		+ e[1] * e[1]
+		+ e[2] * e[2]);
 	e[0] *= k; e[1] *= k; e[2] *= k;
 }
 

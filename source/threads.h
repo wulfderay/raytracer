@@ -1,7 +1,7 @@
 #ifndef THREADS_H_INCLUDED
 #define THREADS_H_INCLUDED
 
-#include "renderer.h"
+#include "engine/renderer.h"
 
 #define MAX_THREADS 16 // should use std::thread::hardware_concurrency(); instead...
 
