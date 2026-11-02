@@ -18,6 +18,7 @@ $RECYCLE.BIN/
 *.lnk
 
 #build files
+build/
 cmake-build-debug/
 cmake-build-release/
 *.pdb
