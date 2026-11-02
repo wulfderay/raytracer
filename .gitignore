@@ -17,7 +17,9 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-#windows build files
+#build files
+cmake-build-debug/
+cmake-build-release/
 *.pdb
 *.exe
 *.suo
